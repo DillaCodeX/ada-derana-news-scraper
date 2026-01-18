@@ -1,18 +1,19 @@
-# 📰 Ada Derana Scraper (v1.1.1)
+# 📰 Ada Derana News Scraper (v1.0.0)
 
 A lightweight API and scraper for Ada Derana Sinhala news content. This package allows you to easily access hot news headlines, summaries, and links from the Ada Derana Sinhala news website.
 
 ## 🚀 Installation
 
 ```bash
-npm install adaderana-scraper
+npm install ada-derana-news-scraper
 ```
 
 ## ✨ Features
 
 - 🌐 Express.js API endpoint for hot news
 - 🔍 Standalone scraper function
-- 🔌 Simple integration with existing applications
+- 🔌 Easy integration with existing Node.js applications
+- 🖼️ Returns news images, summary, and links
 
 ## 📘 Usage
 
@@ -23,28 +24,28 @@ You can create a simple server to run the API:
 ```javascript
 // server.js
 const express = require('express');
-const adaDerana = require('adaderana-scraper');
-require('dotenv').config(); // Load environment variables from .env file
+const adaDerana = require('ada-derana-news-scraper');
+require('dotenv').config(); // Load environment variables
 
-const server = adaDerana.createAdaDeranaAPI();
-const PORT = process.env.PORT;
+const server = adaDerana.createAdaDeranaNewsAPI();
+const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}/hotNews`);
 });
 ```
 
 ### 🛠️ As an Express API
 
 ```javascript
-const { createAdaDeranaAPI } = require('adaderana-scraper');
+const { createAdaDeranaNewsAPI } = require('ada-derana-news-scraper');
 require('dotenv').config(); // Load environment variables
 
-const app = createAdaDeranaAPI();
+const app = createAdaDeranaNewsAPI();
 
 // Optional: Add more routes or middleware here
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Ada Derana API server running on port ${PORT}`);
 });
@@ -53,7 +54,7 @@ app.listen(PORT, () => {
 ### 🧰 As a Scraper
 
 ```javascript
-const { scrapeHotNews } = require('adaderana-scraper');
+const { scrapeHotNews } = require('ada-derana-news-scraper');
 
 async function getNews() {
   try {
@@ -108,8 +109,6 @@ $env:PORT=8080; node server.js
 
 ### 🔄 API Endpoints
 
-#### Basic Endpoints (createAdaDeranaAPI)
-
 #### 📋 GET `/hotNews`
 
 Returns the latest hot news headlines from Ada Derana Sinhala.
@@ -117,17 +116,21 @@ Returns the latest hot news headlines from Ada Derana Sinhala.
 **Response Format:**
 ```json
 {
+  "success": true,
   "code": 200,
-  "code_creator": {
-    "name": "Pasindu Madhuwantha",
-    "github": "@PasinduOG"
+  "creator": {
+    "name": "H.A. Diluka Hetti Arachchi",
+    "github": "https://github.com/DillaCodeX"
   },
+  "count": 5,
   "data": [
     {
-      "news": "News headline",
-      "details": "News summary",
+      "title": "News headline",
+      "summary": "News summary",
       "time": "Published time",
-      "url": "https://sinhala.adaderana.lk/news-url"
+      "url": "https://sinhala.adaderana.lk/news-url",
+      "image": "https://sinhala.adaderana.lk/image.jpg",
+      "comments_url": "https://sinhala.adaderana.lk/news-url#disqus_thread"
     }
     // More news items...
   ]
@@ -137,20 +140,17 @@ Returns the latest hot news headlines from Ada Derana Sinhala.
 **Error Response Format:**
 ```json
 {
+  "success": false,
   "code": 500,
-  "code_creator": {
-    "name": "Pasindu Madhuwantha",
-    "github": "@PasinduOG"
-  },
-  "error": "Failed to fetch headlines"
+  "error": "Failed to fetch AdaDerana hot news"
 }
 ```
 
 ### ⚙️ Functions
 
-#### 🔧 `createAdaDeranaAPI()`
+#### 🔧 `createAdaDeranaNewsAPI()`
 
-Creates an Express application with the AdaDeranaAPI routes configured.
+Creates an Express application with the AdaDerana News API routes configured.
 
 **Returns:** Express application instance with the following endpoints:
 - `GET /hotNews` - Returns the latest hot news headlines
@@ -160,10 +160,13 @@ Creates an Express application with the AdaDeranaAPI routes configured.
 Scrapes hot news headlines directly from Ada Derana Sinhala website.
 
 **Returns:** Promise that resolves to an array of news objects with the following properties:
-  - `news`: The headline of the news article
-  - `details`: A summary or snippet of the news article
-  - `time`: The published time of the article
+
+  - `title`: The headline of the news article
+  - `image`: News image URL
+  - `summary`: A snippet of the news article
   - `url`: The full URL to the news article
+  - `comments_url`: Direct link to comments
+  - `time`: The published time of the article
 
 ## 📝 License
 
@@ -171,4 +174,4 @@ MIT
 
 ## 👨‍💻 Author
 
-- Pasindu Madhuwantha ([@PasinduOG](https://github.com/PasinduOG))
+- H.A. Diluka Hetti Arachchi ([@DillaCodeX](https://github.com/DillaCodeX))

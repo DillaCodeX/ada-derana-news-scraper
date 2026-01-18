@@ -16,31 +16,36 @@ const axiosInstance = axios.create({
 
 /* ---------------- SCRAPER ---------------- */
 async function scrapeHotNews() {
-    const response = await axiosInstance.get(HOT_NEWS_URL);
-    const $ = cheerio.load(response.data);
-    const newsData = [];
+    try {
+        const response = await axiosInstance.get(HOT_NEWS_URL);
+        const $ = cheerio.load(response.data);
+        const newsData = [];
 
-    $('div.news-story').each((_, el) => {
-        const titleEl = $(el).find('h2 a');
-        const imageEl = $(el).find('.thumb-image img');
-        const commentsEl = $(el).find('.comments a');
-        const relativeUrl = titleEl.attr('href');
+        $('div.news-story').each((_, el) => {
+            const titleEl = $(el).find('h2 a');
+            const imageEl = $(el).find('.thumb-image img');
+            const commentsEl = $(el).find('.comments a');
+            const relativeUrl = titleEl.attr('href');
 
-        newsData.push({
-            title: titleEl.text().trim(),
-            image: imageEl.attr('src') || null,
-            summary: $(el).find('.story-text > p').text().trim(),
-            url: relativeUrl ? `${BASE_URL}/${relativeUrl}` : null,
-            comments_url: commentsEl.attr('href')? `${BASE_URL}/${commentsEl.attr('href')}`: null,
-            time: $(el).find('.comments span').text().replace('|', '').trim()
+            newsData.push({
+                title: titleEl.text().trim(),
+                image: imageEl.attr('src') || null,
+                summary: $(el).find('.story-text > p').text().trim(),
+                url: relativeUrl ? `${BASE_URL}/${relativeUrl}` : null,
+                comments_url: commentsEl.attr('href') ? `${BASE_URL}/${commentsEl.attr('href')}` : null,
+                time: $(el).find('.comments span').text().replace('|', '').trim()
+            });
         });
-    });
 
-    return newsData;
+        return newsData;
+    } catch (err) {
+        console.error('[Scraper ERROR]', err.message);
+        return []; // Return empty array if scraping fails
+    }
 }
 
 /* ---------------- API ---------------- */
-function createAdaDeranaAPI() {
+function createAdaDeranaNewsAPI() {
     const app = express();
 
     app.get('/hotNews', async (req, res) => {
@@ -55,6 +60,7 @@ function createAdaDeranaAPI() {
                     github: 'https://github.com/DillaCodeX'
                 },
                 count: data.length,
+                timestamp: new Date().toISOString(), // Added timestamp
                 data
             });
         } catch (error) {
@@ -63,7 +69,8 @@ function createAdaDeranaAPI() {
             res.status(500).json({
                 success: false,
                 code: 500,
-                error: 'Failed to fetch AdaDerana hot news'
+                error: 'Failed to fetch AdaDerana hot news',
+                timestamp: new Date().toISOString() // Timestamp included on error
             });
         }
     });
@@ -72,6 +79,7 @@ function createAdaDeranaAPI() {
 }
 
 module.exports = {
-    createAdaDeranaAPI,
+    createAdaDeranaNewsAPI,
     scrapeHotNews
 };
+/* ---------------- EXPORTS ---------------- */
